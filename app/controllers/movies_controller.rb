@@ -7,13 +7,18 @@ class MoviesController < ApplicationController
   end
 
   def index
+    session[:return_to] ||= request.url
+    if params == {"action"=>"index", "controller"=>"movies"}
+      redirect_to session[:return_to]
+    end
+    session[:return_to] = request.url
     @sort = params[:sort]
     @movies = []
-    puts "@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@"
-    puts params[:sort]
-    @ratings_list = ["G", "PG", "PG-13", "R", "NC-17"]
+    @all_ratings = ["G", "PG", "PG-13", "R", "NC-17"]
     if params[:ratings] == nil
       @movies = Movie.all
+      params[:ratings] = {"G"=>"1", "PG"=>"1", "PG-13"=>"1", "R"=>"1", "NC-17"=>"1"}
+      # redirect_to session[:return_to]
     else      
       Movie.all.each { |value| 
         if params[:ratings][value.rating] == "1"
