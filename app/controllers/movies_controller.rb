@@ -7,7 +7,25 @@ class MoviesController < ApplicationController
   end
 
   def index
-    @movies = Movie.all
+    @sort = params[:sort]
+    @movies = []
+    puts "@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@"
+    puts params[:sort]
+    @ratings_list = ["G", "PG", "PG-13", "R", "NC-17"]
+    if params[:ratings] == nil
+      @movies = Movie.all
+    else      
+      Movie.all.each { |value| 
+        if params[:ratings][value.rating] == "1"
+          @movies << value
+        end
+      }
+    end
+    if @sort == "title"
+      @movies.sort!{|a, b| a.title.downcase <=> b.title.downcase}
+    elsif @sort == "date"
+      @movies.sort!{|a, b| a.release_date <=> b.release_date}
+    end
   end
 
   def new
