@@ -7,19 +7,28 @@ class MoviesController < ApplicationController
   end
 
   def index
-    session[:return_to] ||= request.url
+    redirected = false
+    if(session[:first] == nil)
+      session[:first] = true
+    end
     if params == {"action"=>"index", "controller"=>"movies"}
+      if(!session[:first])
+        redirect_to session[:return_to]
+        redirected = true
+      else
+        session[:first] = false
+        @movies = Movie.all
+        params[:ratings] = {"G"=>"1", "PG"=>"1", "PG-13"=>"1", "R"=>"1", "NC-17"=>"1"}
+      end
+    end
+    if params[:ratings].nil? && !redirected
       redirect_to session[:return_to]
     end
     session[:return_to] = request.url
     @sort = params[:sort]
     @movies = []
     @all_ratings = ["G", "PG", "PG-13", "R", "NC-17"]
-    if params[:ratings] == nil
-      @movies = Movie.all
-      params[:ratings] = {"G"=>"1", "PG"=>"1", "PG-13"=>"1", "R"=>"1", "NC-17"=>"1"}
-      # redirect_to session[:return_to]
-    else      
+    if !params[:ratings].nil?    
       Movie.all.each { |value| 
         if params[:ratings][value.rating] == "1"
           @movies << value
@@ -59,6 +68,10 @@ class MoviesController < ApplicationController
     @movie.destroy
     flash[:notice] = "Movie '#{@movie.title}' deleted."
     redirect_to movies_path
+  end
+
+  def test
+    redirect_to(:action => 'index')
   end
 
 end

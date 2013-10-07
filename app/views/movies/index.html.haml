@@ -8,6 +8,8 @@
   = hidden_field_tag(:sort, @sort)
   = submit_tag "Submit"
 
+%h2= @params_ratings
+
 %table#movies
   %thead
     %tr
@@ -24,3 +26,4 @@
         %td= link_to "More about #{movie.title}", movie_path(movie)
 
 = link_to 'Add new movie', new_movie_path
+= link_to("Nuke session", {:action => 'index', :nuke_session => "true"})
